@@ -1,0 +1,24 @@
+apiVersion: argoproj.io/v1alpha1
+kind: AppProject
+metadata:
+  name: platform
+  namespace: argocd
+  annotations:
+    argocd.argoproj.io/sync-wave: "-1"
+spec:
+  description: Platform components managed by Argo CD
+  sourceRepos:
+    - https://istio-release.storage.googleapis.com/charts
+    - git@github.com:wiliscavalcante/platform-apps.git
+    - git@github.com:wiliscavalcante/platform-gitops.git
+  destinations:
+    - server: https://kubernetes.default.svc
+      namespace: istio-system
+  clusterResourceWhitelist:
+    - group: "*"
+      kind: "*"
+  namespaceResourceWhitelist:
+    - group: "*"
+      kind: "*"
+  orphanedResources:
+    warn: true

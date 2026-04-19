@@ -1,0 +1,54 @@
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  name: istio-ingressgateway
+  namespace: argocd
+  annotations:
+    argocd.argoproj.io/sync-wave: "2"
+spec:
+  project: platform
+  source:
+    repoURL: https://istio-release.storage.googleapis.com/charts
+    chart: gateway
+    targetRevision: 1.23.2
+    helm:
+      releaseName: istio-ingressgateway
+      skipSchemaValidation: true
+      valuesObject:
+        service:
+          type: NodePort
+          ports:
+            - name: status-port
+              port: 15021
+              protocol: TCP
+              targetPort: 15021
+              nodePort: 30090
+            - name: http2
+              port: 80
+              protocol: TCP
+              targetPort: 80
+              nodePort: 30080
+            - name: https
+              port: 443
+              protocol: TCP
+              targetPort: 443
+              nodePort: 30443
+        autoscaling:
+          enabled: false
+        replicaCount: 2
+        resources:
+          requests:
+            cpu: 50m
+            memory: 128Mi
+          limits:
+            cpu: 500m
+            memory: 512Mi
+  destination:
+    server: https://kubernetes.default.svc
+    namespace: istio-system
+  syncPolicy:
+    automated:
+      prune: true
+      selfHeal: true
+    syncOptions:
+      - CreateNamespace=true
