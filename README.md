@@ -2,13 +2,17 @@
 
 Estado desejado dos clusters gerenciados pelo Argo CD.
 
-Neste lab, o cluster local usa:
+Neste lab, simulamos tres clusters:
 
 ```text
-clusters/local
+clusters/dev
+clusters/uat
+clusters/prod
 ```
 
-## Ordem do Istio
+Cada cluster tem seu proprio Argo CD e aponta para a sua propria pasta.
+
+## Istio
 
 O Istio esta separado em tres Applications:
 
@@ -24,12 +28,16 @@ A ordem conceitual e:
 istio-base -> istiod -> istio-ingressgateway
 ```
 
-No primeiro aprendizado, mantemos as Applications explicitas para enxergar cada etapa na UI do Argo CD. Em ambientes reais, componentes com dependencia forte podem exigir um fluxo mais controlado de bootstrap ou sync manual inicial em ordem.
-
-Em producao, a mesma estrutura evolui para:
+Os charts vem do repositorio oficial do Istio:
 
 ```text
-clusters/dev
-clusters/uat
-clusters/prod
+https://istio-release.storage.googleapis.com/charts
 ```
+
+Os values vem do `platform-apps`:
+
+```text
+git@github.com:wiliscavalcante/platform-apps.git
+```
+
+As Applications de plataforma nao usam auto-sync neste primeiro desenho. O root app cria as Applications, e a sincronizacao inicial do Istio deve ser feita em ordem controlada.
